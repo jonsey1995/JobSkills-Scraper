@@ -1,0 +1,12 @@
+{
+  "name": "job-skill-scrape",
+  "version": "0.0.1",
+  "description": "Job skills html scraper",
+  "main": "serverScrape.js",
+  "author": "Scotch",
+  "dependencies": {
+    "express": "latest",
+    "request": "latest",
+    "cheerio": "latest"
+  }
+}

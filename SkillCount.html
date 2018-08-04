@@ -1,0 +1,21 @@
+<html>
+    <head>
+    <script type="text/javascript" src="output.json"></script>
+    <script>
+        $.getJSON("output.json", function (data) {
+            for (let i = 0; i < 5; i++){
+                var div = document.getElementById("data");
+                div.innerHTML += [i].jobName;
+            }
+        });
+
+    </script>        
+    </head>
+
+    <body onload="load()">
+    <div id= "data">
+        hello world
+
+    </div>
+    </body>
+</html>
