@@ -6,8 +6,9 @@
   "author": "Scotch",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "cheerio": "latest",
+    "cheerio": "^1.0.0-rc.2",
     "express": "latest",
-    "request": "latest"
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2"
   }
 }

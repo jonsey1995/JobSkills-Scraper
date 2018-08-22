@@ -89,35 +89,30 @@ app.get('/myform', function(req, res){
     }]
     ;
     
-    //for(let i= 0;i<jobObj.length; i++){
-        request(jobObj[1].url, function(err, res, body){
-            if(!err){
-                var $ = cheerio.load(body);
+    request(jobObj[1].url, function(err, res, body){
+        if(!err && res.statusCode == 200){
+            var $ = cheerio.load(body);
             
-                $('#job_summary').each(function(){
-                    var data = $(this);
-                    var textout = data.text();
-                    jobs[1].jobDesc = textout;
+            $('#job_summary').each(function(){
+                var data = $(this);
+                var textout = data.text();
+                jobs[1].jobDesc = textout;
                 
-                });
+            });
 
-                $('.jobtitle').each(function(){
-                    var data = $(this);
-                    var jobtitle = data.text();
-                    jobs[1].jobName = jobtitle;
-                })
+            $('.jobtitle').each(function(){
+                var data = $(this);
+                var jobtitle = data.text();
+                jobs[1].jobName = jobtitle;
+            })
                 
-                fs.writeFile('output.json', JSON.stringify(jobs, null, "\t"), function(err){ 
-                    if(err){console.log("output.json file not written")}
-                    else console.log("output.json file written!");
-                })    
-                
-            }    
-        });
-    //}
-    
-     
-              
+            fs.writeFile('output.json', JSON.stringify(jobs[1], null, "\t"), function(err){ 
+                if(err){console.log("output.json file not written")}
+                else console.log("output.json file written!");
+            }) 
+                           
+        }    
+    });             
 })
 
 // To write to the system we will use the built in 'fs' library.
