@@ -1,30 +1,36 @@
 var express = require('express');
 var fs = require('fs');
+var bodyParser = require('body-parser');
 var request = require('request');//for retrieving html 
 var cheerio = require('cheerio');//for navigation around html using jQuery notation
 //create an express application
 var app     = express();
 
+app.use(bodyParser.urlencoded({ extended: false }))
+
+app.use(bodyParser.json());
+app.use(express.json());
+
 var jobObj = [
     {
     id:1, 
-    url:"https://www.indeed.co.uk/cmp/Daffodil-IT/jobs/Lead-Junior-Website-Developer-59ea7d446bdf1253?q=Junior+Web+Developer&vjs=3"
+    url:"https://www.indeed.co.uk/cmp/Daffodil-IT/jobs/Lead-Junior-Website-Developer-59ea7d446bdf1253?q=Junior+Web+Developer&vjs=3",
     }, 
     {
     id:2, 
-    url:"https://www.indeed.co.uk/cmp/Crush-Design/jobs/Middleweight-Web-Developer-541331b7885c03cf?q=Web+Developer&vjs=3"
+    url:"https://www.indeed.co.uk/cmp/Crush-Design/jobs/Middleweight-Web-Developer-541331b7885c03cf?q=Web+Developer&vjs=3",
     },
     {
     id:3,
-    url:"https://www.indeed.co.uk/cmp/Monigold-Solutions/jobs/Graduate-Web-Software-Engineer-a5787dc322c0ca36?q=Web+Developer&vjs=3"
+    url:"https://www.indeed.co.uk/cmp/Monigold-Solutions/jobs/Graduate-Web-Software-Engineer-a5787dc322c0ca36?q=Web+Developer&vjs=3",
     },
     {
     id:4,
-    url:"https://www.indeed.co.uk/cmp/ZOO-DIGITAL-GROUP-PLC/jobs/Web-Developer-5cdde1c3b0b7b8d0?q=Web+Developer&vjs=3"
+    url:"https://www.indeed.co.uk/cmp/ZOO-DIGITAL-GROUP-PLC/jobs/Web-Developer-5cdde1c3b0b7b8d0?q=Web+Developer&vjs=3",
     },
     {
     id:5,
-    url:"https://www.indeed.co.uk/viewjob?jk=9cc3d8c637c41067&q=Web+Developer&l=Sheffield&tk=1cf5di52e9u0ocam&from=web&vjs=3"
+    url:"https://www.indeed.co.uk/viewjob?jk=9cc3d8c637c41067&q=Web+Developer&l=Sheffield&tk=1cf5di52e9u0ocam&from=web&vjs=3",
     }
 ];
 
@@ -34,7 +40,7 @@ var jobObj = [
 //a callback function sends a response to the browser
 //and sends request to url
 app.get('/', (req, res) => {
-    res.send('Hey, Welcome to my Job skills finder app!');
+    res.send('Hey, Welcome to my Job skills finder app!' + JSON.stringify(jobObj))
 });
 
 app.put('/jobs/:id', (req, res) => {
@@ -44,19 +50,16 @@ app.put('/jobs/:id', (req, res) => {
     }
     //find object with matching job id and call it updateUrl
     const updateUrl = jobObj.find(findID);
-    console.log(updateUrl);
-
-    if(!updateUrl) {
-        res.send(`sorry cannot find id ${req.params.id} in the jobObj object`);
-    }
-    
     updateUrl.url = req.body.url;
-    res.send(upateUrl);
+    res.send(updateUrl);
+    if(!updateUrl) {
+        res.status(404).send(`sorry cannot find id ${req.params.id} in the jobObj object`);
+    }
 });
 
 app.get('/myform', function(req, res){
-    res.send('Check your console!');
-    //res.send(`scanning ${url.length} urls for job description text`);
+    
+    res.send(`scanning ${jobObj.length} urls for job description text`);
     //make assign input form data to node "url" variable
 
 
@@ -86,37 +89,35 @@ app.get('/myform', function(req, res){
     }]
     ;
     
-    for (let i=0; i<url.length; i++){
-        
-        //request module to retrieve url 
-        request(url[i].url, function(error, response, html){
-            //if no error in request, load body of url
-            if(!error){
-                //gives us jQuery functionality on loaded html
-                var $ = cheerio.load(html);
-                
-                
+    //for(let i= 0;i<jobObj.length; i++){
+        request(jobObj[1].url, function(err, res, body){
+            if(!err){
+                var $ = cheerio.load(body);
+            
                 $('#job_summary').each(function(){
                     var data = $(this);
                     var textout = data.text();
-                    jobs[i].jobDesc = textout;
-                    
-                });
+                    jobs[1].jobDesc = textout;
                 
+                });
+
                 $('.jobtitle').each(function(){
                     var data = $(this);
                     var jobtitle = data.text();
-                    jobs[i].jobName = jobtitle;
+                    jobs[1].jobName = jobtitle;
                 })
-            }
-            fs.writeFile('output.json', JSON.stringify(jobs, null, "\t"), function(err){   
-            })  
-        
-            
-        })     
-    }
-    console.log("output.json file written!");
-         
+                
+                fs.writeFile('output.json', JSON.stringify(jobs, null, "\t"), function(err){ 
+                    if(err){console.log("output.json file not written")}
+                    else console.log("output.json file written!");
+                })    
+                
+            }    
+        });
+    //}
+    
+     
+              
 })
 
 // To write to the system we will use the built in 'fs' library.

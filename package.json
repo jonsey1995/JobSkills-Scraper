@@ -5,8 +5,9 @@
   "main": "serverScrape.js",
   "author": "Scotch",
   "dependencies": {
+    "body-parser": "^1.18.3",
+    "cheerio": "latest",
     "express": "latest",
-    "request": "latest",
-    "cheerio": "latest"
+    "request": "latest"
   }
 }
