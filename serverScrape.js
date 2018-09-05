@@ -2,6 +2,7 @@ var express = require('express');
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var request = require('request');//for retrieving html 
+var rp = require('request-promise');  // request behaviour defined by options object, next step .then 
 var cheerio = require('cheerio');//for navigation around html using jQuery notation
 //create an express application
 var app     = express();
@@ -62,19 +63,19 @@ app.get('/myform', function(req, res){
     //make assign input form data to node "url" variable
 
     //Compnonents for a request counter
-    var jobs = new Array;
-    function scrapeFinished(){console.log("all websites scraped!");};
-    var itemsProcessed = 0;   
+    var jobs = new Array; 
+    var newJob = new Object;
+    var options = {
+        uri: "https://www.indeed.co.uk/cmp/Daffodil-IT/jobs/Lead-Junior-Website-Developer-59ea7d446bdf1253?q=Junior+Web+Developer&vjs=3",
+        transform: function(body){
+            return cheerio.load(body);
+        }
+    };
 
-    jobObj.forEach(function(item){
-        var newJob = new Object;
-        request(item.url, function(err, res, html){
-
-            if(!err){
-
-                var $ = cheerio.load(html);
-                
-                $('#job_summary').each(function(){
+    rp(options)
+        .then(function ($) {
+            console.log(options.uri);
+            $('#job_summary').each(function(){
                     var data = $(this);
                     var textout = data.text();
                     newJob.jobDesc = textout;    
@@ -85,24 +86,20 @@ app.get('/myform', function(req, res){
                     var jobtitle = data.text();
                     newJob.jobName = jobtitle;
                 });
-
-                
-                itemsProcessed++;
-                console.log(item.url + " scraped");  
-                
-                if(itemsProcessed === jobObj.length){
-                scrapeFinished();
-
-                fs.writeFile('output.json', JSON.stringify(jobs, null, "\t"), function(err){ 
-                if(!err){console.log("output.json file written")}
-                })
-                }
-            }      
         })
-        jobs.push(newJob);           
-    })
-
-    
+        .then(function(){
+            jobs.push(newJob); 
+        })
+        .then(function() {
+            fs.writeFile('output.json', JSON.stringify(jobs, null, "\t"), function(err){ 
+            if(!err){console.log("output.json file written")}
+        })
+        /*
+        .catch(function (err) {
+            console.log(`error in scraping url: ${options.uri}`);
+        });
+        */              
+    })    
 })
 
 // To write to the system we will use the built in 'fs' library.
