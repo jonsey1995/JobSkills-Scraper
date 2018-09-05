@@ -35,12 +35,11 @@ var jobObj = [
 ];
 
 
-
 //app.get request for path route /scrape, 
 //a callback function sends a response to the browser
 //and sends request to url
 app.get('/', (req, res) => {
-    res.send('Hey, Welcome to my Job skills finder app!' + JSON.stringify(jobObj))
+    res.send('<h1>Hey, Welcome to my Job skills finder app!</h1>' + "<h2>"+JSON.stringify(jobObj)+"</h2>")
 });
 
 app.put('/jobs/:id', (req, res) => {
@@ -59,60 +58,51 @@ app.put('/jobs/:id', (req, res) => {
 
 app.get('/myform', function(req, res){
     
-    res.send(`scanning ${jobObj.length} urls for job description text`);
+    res.send("<h1>" + `scanning ${jobObj.length} urls for job description text` + "</h1>");
     //make assign input form data to node "url" variable
 
+    //Compnonents for a request counter
+    var jobs = new Array;
+    function scrapeFinished(){console.log("all websites scraped!");};
+    var itemsProcessed = 0;   
+
+    jobObj.forEach(function(item){
+        var newJob = new Object;
+        request(item.url, function(err, res, html){
+
+            if(!err){
+
+                var $ = cheerio.load(html);
+                
+                $('#job_summary').each(function(){
+                    var data = $(this);
+                    var textout = data.text();
+                    newJob.jobDesc = textout;    
+                });
+
+                $('.jobtitle').each(function(){
+                    var data = $(this);
+                    var jobtitle = data.text();
+                    newJob.jobName = jobtitle;
+                });
+
+                
+                itemsProcessed++;
+                console.log(item.url + " scraped");  
+                
+                if(itemsProcessed === jobObj.length){
+                scrapeFinished();
+
+                fs.writeFile('output.json', JSON.stringify(jobs, null, "\t"), function(err){ 
+                if(!err){console.log("output.json file written")}
+                })
+                }
+            }      
+        })
+        jobs.push(newJob);           
+    })
 
     
-    //request from url parameter 1 = url, parameter 2 is a callback function
-    // that takes 3 parameters an error, response status code and html
-    //create an array of objects, set scraped text as jobDesc item in array
-    var jobs = [{
-    jobName: "",
-    jobDesc: ""
-    },
-    {
-    jobName: "",
-    jobDesc: ""
-    },
-    {
-    jobName: "",
-    jobDesc: ""
-    },
-    {
-    jobName: "",
-    jobDesc: ""
-    },
-    {
-    jobName: "",
-    jobDesc: ""
-    }]
-    ;
-    
-    request(jobObj[1].url, function(err, res, body){
-        if(!err && res.statusCode == 200){
-            var $ = cheerio.load(body);
-            
-            $('#job_summary').each(function(){
-                var data = $(this);
-                var textout = data.text();
-                jobs[1].jobDesc = textout;
-                
-            });
-
-            $('.jobtitle').each(function(){
-                var data = $(this);
-                var jobtitle = data.text();
-                jobs[1].jobName = jobtitle;
-            })
-                
-            fs.writeFile('output.json', JSON.stringify(jobs[1], null, "\t"), function(err){ 
-                if(err){console.log("output.json file not written")}
-                else console.log("output.json file written!");
-            }) 
-                           
-        }    
-    });             
 })
 
 // To write to the system we will use the built in 'fs' library.

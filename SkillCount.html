@@ -1,30 +1,14 @@
 <html>
     <head>
+    <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.6.1.min.js"></script>
     <script>
-
-        const handleFormSubmit = event => {
-            
-
-            // Stop the form from submitting since we’re handling that with AJAX.
-            event.preventDefault();    
-
-            const data = {};
-
-            const dataContainer = document.getElementsByID("results");
-            dataContainer.textContent = JSON.stringify(data, null,"  ");
-        };
-            
-
-        const form = document.getElementsByID('userURLS');
-        //event listener to execute handleFormSubmit
-        form.addEventListener('submit', handleFormSubmit);
-       
-
-        
-
-
+        $("#submit").click(function() {
+            var x = $("#userURLS").serializeArray();
+            console.log(x);
+        });
 
         function loadDoc() {
+    
             var xmlhttp = new XMLHttpRequest();
             var url = "http://localhost:8080/output.json";
 
@@ -35,8 +19,18 @@
 
                     for (let i=0; i<jobArr.length; i++) {
                         var newJob = document.createElement("div");
-                        var jobNode = document.createTextNode(JSON.stringify(jobArr[i]));
-                        newJob.appendChild(jobNode);
+                        newJob.className = "newJob";
+                        
+                        var jobNameNode = document.createTextNode(JSON.stringify(jobArr[i].jobName));
+                        var jobNameDiv = document.createElement("h3");
+                        jobNameDiv.appendChild(jobNameNode);
+                        jobNameDiv.className = "jobName";
+                        var jobDescNode = document.createTextNode(JSON.stringify(jobArr[i].jobDesc));
+                        var jobDescDiv = document.createElement("p");
+                        jobDescDiv.appendChild(jobDescNode);
+                        jobDescDiv.className = "jobDesc";
+                        newJob.appendChild(jobNameDiv);
+                        newJob.appendChild(jobDescDiv);
 
                         div.appendChild(newJob);
                     }    
@@ -54,21 +48,22 @@
         <h1>Pick 5 Dream Jobs and we'll find the most desired skills for them!</h1>
         <div>
             <form  id="userURLS" enctype="application/json">
-                <label>Job Url 1</label><input name="url" type="text" placeholder="insert job URL here from indeed.co.uk" >
+                <label>Job Url 1</label><input name="url" type="text" value="url" placeholder="insert job URL here from indeed.co.uk">
             </br>
-                <label>Job Url 2</label><input name="url" type="text" placeholder="insert job URL here from indeed.co.uk">
+                <label>Job Url 2</label><input name="url" type="text" value="url" placeholder="insert job URL here from indeed.co.uk">
             </br>
-                <label>Job Url 3</label><input name="url" type="text" placeholder="insert job URL here from indeed.co.uk">
+                <label>Job Url 3</label><input name="url" type="text" value="url" placeholder="insert job URL here from indeed.co.uk">
             </br>
-                <label>Job Url 4</label><input name="url" type="text" placeholder="insert job URL here from indeed.co.uk">
+                <label>Job Url 4</label><input name="url" type="text" value="url" placeholder="insert job URL here from indeed.co.uk">
             </br>
-                <label>Job Url 5</label><input name="url" type="text" placeholder="insert job URL here from indeed.co.uk">
-                <input type="submit" value="submit" onclick="FormDataToJSON(form)">
+                <label>Job Url 5</label><input name="url" type="text" value="url" placeholder="insert job URL here from indeed.co.uk">
+                <input id="submit" type="submit" value="submit">
             </form>
         </div>
 
         <div id="results">
             <h1>JOB Titles</h1>
+            <div id="resultsdemo"></div>
 
         </div>
         <div id="demo">
