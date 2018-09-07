@@ -4,8 +4,9 @@ Express Node script for scraping data from client specific job advert urls and r
 
 CURRENT STATE:
 
-forEach through jobObj, requests url, tries to load html using cheerio and then scrapes jobName and JobDesc and makes these properties
-of an object in the jobs array.
+uses request-promise to synchronously request html, load to Jquery style manipulation using cheerio.
+
+only set up for one url at the moment 
 
 OUTPUT:
-currently very sporadic, usually only 1/5 jobs object complete.
+still very sporadic 
